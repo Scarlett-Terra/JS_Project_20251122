@@ -21,6 +21,8 @@ axios.get(`${customerApi}/products`).then(res=>{
 })
   }
 
+
+
 //炫染卡片全產品
 
 const productWrap = document.querySelector('.productWrap');

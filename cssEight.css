@@ -29,6 +29,11 @@ footer, header, hgroup, menu, nav, section {
   display: block;
 }
 
+
+.hideImg{
+  display:none;
+}
+
 body {
   line-height: 1;
 }

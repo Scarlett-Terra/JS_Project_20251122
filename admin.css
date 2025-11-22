@@ -356,8 +356,8 @@ body {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  margin-left: 30px;
-  min-width: 350px;
+  margin-left: 15px;
+  min-width: 20px;
   background-color: #FFFFFF;
 }
 

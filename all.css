@@ -441,3 +441,8 @@ body {
     margin-top: 0px;
   }
 }
+.chart{
+  justify-content: center;
+  align-items: center;
+  margin: 920px auto  ;
+}

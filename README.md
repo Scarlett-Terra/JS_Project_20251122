@@ -9,8 +9,8 @@
 
 ## 🔗 Demo
 
-👉 前台購物車頁面：` https://scarlett-terra.github.io/JS_Project_20251122/apiEight.html `  
-👉 後台管理頁面：` https://scarlett-terra.github.io/JS_Project_20251122/admin.html `  
+👉 前台購物車頁面：https://scarlett-terra.github.io/JS_Project_20251122/apiEight.html    
+👉 後台管理頁面：https://scarlett-terra.github.io/JS_Project_20251122/admin.html 
 
 ---
 
@@ -44,7 +44,7 @@
 
 ---
 
-## 📌 後台功能 (Backend Dashboard Features)
+## 📌 後台管理功能 (Backend Dashboard Features)
 
 1. 圖表分析  
    - 顯示前三名產品排行榜  
@@ -57,12 +57,7 @@
    - 刪除單一客戶或全部客戶  
 
 ---
-
-> 專案結構可依實際資料夾命名調整。
-
----
-
-## 💡 學習目標 / 收穫
+## 💡 電商學習目標 / 收穫
 
 - 練習 前後台完整購物流程  
 - 熟悉 Axios 串接 API 與 CRUD 操作  
@@ -70,7 +65,36 @@
 - 表單驗證與使用者互動提示（SweetAlert2）  
 - 後台資料分析與圖表呈現 (C3.js)  
 - 金額格式化及 UI 排版技巧  
+---
+
+## ✅ TodoList 介面
+
+這是一個使用 **純 JavaScript + HTML + CSS** 製作的待辦清單專案，  
+可以記錄、管理日常待辦事項，並實現簡單的增刪改查功能。
+
+### 🔗 Demo
+👉 TodoList 頁面：https://scarlett-terra.github.io/JS_Project_20251122/toDoList.html
+
+### 🚀 使用技術
+HTML5 / CSS3 / JavaScript (ES6)  
+DOM 操作與事件綁定  
+LocalStorage（資料永久儲存）  
+事件監聽（新增、刪除、勾選待辦）  
+篩選功能（全部 / 待完成 / 已完成）  
+
+### 📌 功能特色
+- 新增待辦事項  
+- 刪除單一待辦或清空已完成項目  
+- 勾選待辦事項（標記已完成 / 未完成）  
+- 篩選待辦清單（全部、待完成、已完成）  
+- 本地永久儲存（刷新頁面不會遺失資料）  
 
 ---
+
+💡 **TodoList學習目標 / 收穫**
+- 練習 DOM 操作與事件管理  
+- 熟悉資料篩選與條件渲染  
+- LocalStorage 使用與資料永久保存  
+- UI/UX 基礎互動設計   
 
 ## 🧑‍💻 作者Scarlett_Terra

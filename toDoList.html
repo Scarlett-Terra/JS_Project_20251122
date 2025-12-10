@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="CSS/toDoList.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Baloo+2:wght@700&display=swap" rel="stylesheet">
+
+    <title>TodoList 待辦清單</title>
+</head>
+<body>
+    <div class="container">
+        <h1>TODO LIST</h1>
+        <div class="card input">
+            <input type="text" placeholder="請輸入待辦事項" class="txt"/>
+            <a href="#" class="btn_add">+</a>
+        </div>
+        <div class="card card_list">
+            <ul class="tab">
+            <li data-tab="all" class="active" id="tabAll">全部</li>
+            <li data-tab="undone">待完成</li>
+            <li data-tab="done">已完成</li>
+            </ul>
+            <div class="cart_content">
+            <ul class="list">
+                <!-- <li>
+                <label class="checkbox" for="">
+                    <input type="checkbox" />
+                    <span>把冰箱發霉的檸檬拿去丟</span>
+                </label>
+                <a href="#" class="delete"></a>
+                </li>
+                <li>
+                <label class="checkbox" for="">
+                    <input type="checkbox" />
+                    <span>今日需倒垃圾</span>
+                </label>
+                <a href="#" class="delete"></a>
+                </li>
+                <li>
+                <label class="checkbox" for="">
+                    <input type="checkbox" />
+                    <span>洗衣服、批衣服</span>
+                </label>
+                <a href="#" class="delete"></a>
+                </li>
+                <li>
+                <label class="checkbox" for="">
+                    <input type="checkbox" />
+                    <span>外出買蔬菜、水果</span>
+                </label>
+                <a href="#" class="delete"></a>
+                </li> -->
+            </ul>
+            <div class="list_footer">
+                <p class="undoneNum">0 個待完成項目</p>
+                <p class="doneNum">0 個已完成項目</p>
+                <a href="#" class = "deleteAllDown">清除已完成項目</a>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="JS/toDoList.js"></script>
+</body>
+</html>

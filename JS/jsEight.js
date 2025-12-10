@@ -359,7 +359,7 @@ dataMessage.forEach(item=>{
 // 監聽所有 type="text" 內的input 全選 select
 const inputs = document.querySelectorAll('.orderInfo-input');
 
-// 為每一個欄位加上監聽事件
+// 為每一個欄位加上監聽事件 // 距離Input 上層div 最近的 .orderInfo-inputWrap 內的 .orderInfo-message
 inputs.forEach(input => {
   input.addEventListener('input', e => {
     const msg = e.target.closest('.orderInfo-inputWrap').querySelector('.orderInfo-message');

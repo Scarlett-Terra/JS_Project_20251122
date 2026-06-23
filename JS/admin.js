@@ -183,24 +183,24 @@ function calProductTitle(){
         return b[1] - a[1];
     });
         // console.log("sort由大至小排序：",sortResultArr);
-        //排前三名的[]陣列
-        const rankOfThree = [];
-        let otherTotal = 0;
-        sortResultArr.forEach((product,index)=>{
+    //排前三名的[]陣列
+    const rankOfThree = [];
+    let otherTotal = 0;
+    sortResultArr.forEach((product,index)=>{
         if(index <= 2){
             rankOfThree.push(product);
-        }else if(index > 2){
+        }else{
             otherTotal += product[1];
         }
-    
-        if(sortResultArr.length > 3){
-            rankOfThree.push(["其他",otherTotal]);
-    }; 
+    });
+
+    if(otherTotal > 0){
+        rankOfThree.push(["其他",otherTotal]);
+    }
+
     // console.log("前三名陣列：",rankOfThree,otherTotal);
     //已經是[陣列了，不需要object.entries做]
     renderC3(rankOfThree);
-    
-});
 }
 
 //初始化資料
@@ -211,8 +211,22 @@ init();
 
 // C3.js
 function renderC3(data){
+const chartEl = document.querySelector('#chart');
+const isMobile = window.matchMedia('(max-width: 767px)').matches;
 let chart = c3.generate({
     bindto: '#chart', // HTML 元素綁定
+    size: {
+        height: isMobile ? 260 : 300
+    },
+    padding: {
+        top: 8,
+        right: isMobile ? 8 : 20,
+        bottom: 8,
+        left: isMobile ? 8 : 20
+    },
+    legend: {
+        show: false
+    },
     //color - pattern 放外層的話，就會依照所屬色票做炫染
     color:{
         pattern:["#DACBFF","#9D7FEA","#5434A7","#301E5F"]
@@ -223,5 +237,25 @@ let chart = c3.generate({
         
     },
 });
+
+if(chartEl){
+    const oldLegend = chartEl.querySelector('.adminChartLegend');
+    if(oldLegend){
+        oldLegend.remove();
+    }
+
+    const colors = ["#DACBFF","#9D7FEA","#5434A7","#301E5F"];
+    const total = data.reduce((sum,item)=>sum + Number(item[1] || 0),0);
+    const legend = document.createElement('ul');
+    legend.className = 'adminChartLegend';
+    legend.innerHTML = data.map((item,index)=>`
+        <li>
+            <span style="background-color:${colors[index % colors.length]}"></span>
+            <p>${item[0]}</p>
+            <strong>${total ? ((Number(item[1]) / total) * 100).toFixed(1) : 0}%</strong>
+        </li>
+    `).join('');
+    chartEl.appendChild(legend);
+}
 }
 

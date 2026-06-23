@@ -832,13 +832,18 @@ body {
 }
 
 .productSelect {
-  border: 1px solid #B9B9B9;
-  color: #797979;
-  min-height: 38px;
-  min-width: 255px;
-  border-radius: 5px;
-  text-indent: 10px;
-  margin-bottom: 30px;
+  min-width: 320px;
+  min-height: 56px;
+  margin-bottom: 34px;
+  padding: 0 44px 0 18px;
+  border: 2px solid #1F2933;
+  border-radius: 8px;
+  background-color: #FFFFFF;
+  color: #4B5563;
+  font-size: 1rem;
+  font-weight: bold;
+  line-height: 56px;
+  cursor: pointer;
 }
 
 .productWrap {

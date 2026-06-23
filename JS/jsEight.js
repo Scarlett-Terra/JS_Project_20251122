@@ -66,6 +66,51 @@ productSelect.addEventListener('change',(e)=>{
 
 let cartData = [];
 let cartTotal = 0;
+const pendingCartActions = new Set();
+const cartPatchTimers = new Map();
+const cartPatchSnapshots = new Map();
+
+function cloneCartData(){
+  return JSON.parse(JSON.stringify(cartData));
+}
+
+function calcCartTotal(){
+  cartTotal = cartData.reduce((total,item)=>{
+    return total + item.product.price * item.quantity;
+  },0);
+}
+
+function restoreCart(snapshot,total){
+  cartData = snapshot;
+  cartTotal = total;
+  renderCart();
+}
+
+function updateCartTotalDom(){
+  const totalNodes = document.querySelectorAll('.cartTotalPrice');
+  totalNodes.forEach(node=>{
+    node.textContent = `NT$${formatNumber(cartTotal)}`;
+  });
+}
+
+function updateCartItemDom(item){
+  const cartRow = shoppingCartTableBody.querySelector(`tr[data-id="${item.id}"]`);
+  if(!cartRow){
+    return;
+  }
+
+  const qtyNodes = cartRow.querySelectorAll('.cartQty');
+  const subtotalNodes = cartRow.querySelectorAll('.cartSubtotal');
+  const subtotal = item.product.price * item.quantity;
+
+  qtyNodes.forEach(node=>{
+    node.textContent = item.quantity;
+  });
+
+  subtotalNodes.forEach(node=>{
+    node.textContent = `NT$${formatNumber(subtotal)}`;
+  });
+}
 
 function getCart(){
 axios.get(`${customerApi}/carts`).then(res=>{
@@ -84,31 +129,55 @@ const shoppingCartTableFoot = document.querySelector('.shoppingCart-table tfoot'
 
 function renderCart(){
   if(cartData.length === 0){
-  shoppingCartTableBody.innerHTML = '商品目前為空，請選購' ;
+  shoppingCartTableBody.innerHTML = '<tr class="cartEmpty"><td colspan="5">商品目前為空，請選購</td></tr>' ;
   shoppingCartTableFoot.innerHTML = '';
     return;
   }
   
   let str = '';
   cartData.forEach(item=>{
+    const isPending = pendingCartActions.has(item.id);
+    const disabledAttr = isPending ? 'disabled' : '';
     str += `<tr data-id=${item.id} >
-                    <td>
+                    <td data-label="商品">
                         <div class="cardItem-title">
                             <img src="${item.product.images}" alt="">
                             <p>${item.product.title}</p>
                         </div>
+                        <div class="cartMobileItem">
+                          <img src="${item.product.images}" alt="">
+                          <div class="cartMobileContent">
+                            <p class="cartMobileTitle">${item.product.title}</p>
+                            <div class="cartMobileRow">
+                              <span>單價</span>
+                              <strong>NT$${formatNumber(item.product.price)}</strong>
+                            </div>
+                            <div class="cartMobileRow">
+                              <span>數量</span>
+                              <div class="quantityControl">
+                                <button type="button" class="minusBtn" ${disabledAttr}>-</button>
+                                <span class="cartQty">${item.quantity}</span>
+                                <button type="button" class="addBtn" ${disabledAttr}>+</button>
+                              </div>
+                            </div>
+                            <div class="cartMobileRow">
+                              <span>小計</span>
+                              <strong class="cartSubtotal">NT$${formatNumber(item.product.price * item.quantity)}</strong>
+                            </div>
+                          </div>
+                        </div>
                     </td>
-                    <td>NT$${formatNumber(item.product.price)}</td>
-                    <td>
-                      <button type="button" class="minusBtn"> - </button>
-                      ${item.quantity}
-                      <button type="button" class="addBtn"> + </button>
+                    <td data-label="單價"><span>NT$${formatNumber(item.product.price)}</span></td>
+                    <td data-label="數量">
+                      <div class="quantityControl">
+                        <button type="button" class="minusBtn" ${disabledAttr}>-</button>
+                        <span class="cartQty">${item.quantity}</span>
+                        <button type="button" class="addBtn" ${disabledAttr}>+</button>
+                      </div>
                   </td>
-                    <td>NT$${formatNumber(item.product.price * item.quantity)}</td>
-                    <td class="discardBtn">
-                        <a href="#" class="material-icons clearBtn">
-                            X
-                        </a>
+                    <td data-label="小計"><span class="cartSubtotal">NT$${formatNumber(item.product.price * item.quantity)}</span></td>
+                    <td class="discardBtn" data-label="操作">
+                        <a href="#" class="material-icons clearBtn" aria-label="刪除商品">close</a>
                     </td>
                 </tr>`; 
   });
@@ -122,19 +191,36 @@ function renderCart(){
                     <td>
                         <p>總金額</p>
                     </td>
-                    <td>NT$${cartTotal}</td>
+                    <td class="cartTotalPrice">NT$${formatNumber(cartTotal)}</td>
                 </tr>`;
 }
 
 //取得post 新增購物車功能
 
 function postCart(id,quantity){
-  //新增成功 提示功能 放在 post
-   Toast.fire({
-  icon: "success",
-  title: "您的商品添加成功❤️"
-});
-  
+  const previousCartData = cloneCartData();
+  const previousCartTotal = cartTotal;
+  const existCartItem = cartData.find(item=>item.product.id === id);
+  const pendingId = existCartItem ? existCartItem.id : `pending-${id}`;
+
+  pendingCartActions.add(pendingId);
+
+  if(existCartItem){
+    existCartItem.quantity = quantity;
+  }else{
+    const product = productData.find(item=>item.id === id);
+    if(product){
+      cartData.push({
+        id: pendingId,
+        quantity,
+        product
+      });
+    }
+  }
+
+  calcCartTotal();
+  renderCart();
+
   const data = {
   "data": {
     "productId": id,
@@ -142,34 +228,27 @@ function postCart(id,quantity){
   }
 }
   
-axios.post(`${customerApi}/carts`,data).then(res=>{
+return axios.post(`${customerApi}/carts`,data).then(res=>{
   cartData = res.data.carts;
   cartTotal = res.data.finalTotal;
   // 這個要渲染 取得全部購物車資料的空陣列內容
   renderCart(cartData);  
+  Toast.fire({
+    icon: "success",
+    title: "您的商品添加成功"
+  });
 }).catch(error=>{
   console.log(error);
+  restoreCart(previousCartData,previousCartTotal);
+  Toast.fire({
+    icon: "error",
+    title: "加入失敗，請稍後再試"
+  });
+}).finally(()=>{
+  pendingCartActions.delete(pendingId);
+  renderCart();
 });
 }
-
-// 新增購物車 監聽功能
-// productWrap.addEventListener('click',(e)=>{
-//    e.preventDefault();
-//    if(e.target.classList.contains('addCardBtn')){
-//       postCart(e.target.dataset.id);
-//    }
-
-//    // 偉杰老師的加入購物車立刻新增數字寫法
-//   const productId = e.target.dataset.id;
-
-//    let qty = 1;
-//    cartData.forEach(item=>{
-//      if(item.product.id === productId){
-//        qty = item.quantity += 1 ;
-//      }
-//   });
-//     postCart(productId,qty)
-// })
 
 
 // 新增購物車 監聽功能 2 修改後可以點加入購物車就新增數字
@@ -178,9 +257,11 @@ productWrap.addEventListener('click', (e) => {
   e.preventDefault();
   
   const btn = e.target.closest('.addCardBtn');
-  if (!btn) return;
+  if (!btn || btn.classList.contains('is-loading')) return;
 
   const productId = btn.dataset.id;
+  btn.classList.add('is-loading');
+  btn.textContent = '加入中...';
 
   let quantity = 1;
 
@@ -190,14 +271,23 @@ productWrap.addEventListener('click', (e) => {
     }
   });
 
-  postCart(productId, quantity);
+  postCart(productId, quantity).finally(()=>{
+    btn.classList.remove('is-loading');
+    btn.textContent = '加入購物車';
+  });
 });
 
 
 // delete 刪除所有品項
 
 function deleteAllCart(){
-  
+  const previousCartData = cloneCartData();
+  const previousCartTotal = cartTotal;
+
+  cartData = [];
+  cartTotal = 0;
+  renderCart();
+
 axios.delete(`${customerApi}/carts`).then(res=>{
   cartData = res.data.carts;
   cartTotal = res.data.finalTotal;
@@ -206,6 +296,11 @@ axios.delete(`${customerApi}/carts`).then(res=>{
   
 }).catch(error=>{
   console.log(error);
+  restoreCart(previousCartData,previousCartTotal);
+  Toast.fire({
+    icon: "error",
+    title: "清空失敗，請稍後再試"
+  });
 });
 }
 
@@ -220,6 +315,14 @@ shoppingCartTableFoot.addEventListener('click',(e)=>{
 // delete 單一刪除 id 品項
 
 function deleteOneCart(id){
+const previousCartData = cloneCartData();
+const previousCartTotal = cartTotal;
+pendingCartActions.add(id);
+
+cartData = cartData.filter(item=>item.id !== id);
+calcCartTotal();
+renderCart();
+
 axios.delete(`${customerApi}/carts/${id}`).then(res=>{
   cartData = res.data.carts;
   cartTotal = res.data.finalTotal;
@@ -227,6 +330,14 @@ axios.delete(`${customerApi}/carts/${id}`).then(res=>{
   renderCart();  
 }).catch(error=>{
   console.log(error);
+  restoreCart(previousCartData,previousCartTotal);
+  Toast.fire({
+    icon: "error",
+    title: "刪除失敗，請稍後再試"
+  });
+}).finally(()=>{
+  pendingCartActions.delete(id);
+  renderCart();
 });
 }
 
@@ -234,27 +345,75 @@ axios.delete(`${customerApi}/carts/${id}`).then(res=>{
 // 修改數量 patch 
 
 function updateCart(id,qty){
-  const data = {
-  "data": {
-     id,
-    "quantity": qty
+  if(qty < 1 || pendingCartActions.has(id)){
+    return;
   }
-}
+
+  const targetCartItem = cartData.find(item=>item.id === id);
+  if(!targetCartItem){
+    return;
+  }
+
+  if(!cartPatchSnapshots.has(id)){
+    cartPatchSnapshots.set(id,{
+      cartData: cloneCartData(),
+      cartTotal
+    });
+  }
+
+  targetCartItem.quantity = qty;
+  calcCartTotal();
+  updateCartItemDom(targetCartItem);
+  updateCartTotalDom();
+
+  if(cartPatchTimers.has(id)){
+    clearTimeout(cartPatchTimers.get(id));
+  }
+
+  const timer = setTimeout(()=>{
+    const data = {
+      data: {
+        id,
+        quantity: targetCartItem.quantity
+      }
+    };
   
-axios.patch(`${customerApi}/carts`,data).then(res=>{
-  cartData = res.data.carts;
-  cartTotal = res.data.finalTotal;
-  // 這個要渲染 取得全部購物車資料的空陣列內容
-  renderCart();  
-}).catch(error=>{
-  console.log(error);
-});
+    axios.patch(`${customerApi}/carts`,data).then(res=>{
+      cartData = res.data.carts;
+      cartTotal = res.data.finalTotal;
+      const updatedCartItem = cartData.find(item=>item.id === id);
+      if(updatedCartItem){
+        updateCartItemDom(updatedCartItem);
+      }
+      updateCartTotalDom();
+      cartPatchSnapshots.delete(id);
+    }).catch(error=>{
+      const snapshot = cartPatchSnapshots.get(id);
+      console.log(error);
+      if(snapshot){
+        restoreCart(snapshot.cartData,snapshot.cartTotal);
+      }
+      Toast.fire({
+        icon: "error",
+        title: "更新失敗，請稍後再試"
+      });
+      cartPatchSnapshots.delete(id);
+    }).finally(()=>{
+      cartPatchTimers.delete(id);
+    });
+  },250);
+
+  cartPatchTimers.set(id,timer);
 }
 
 
 // 單一刪除指令 監聽 // 因為數量不能歸零 所以加號必須先做出來
 shoppingCartTableBody.addEventListener('click',(e)=>{
-  let deleteId = e.target.closest('tr').getAttribute('data-id');
+  const cartRow = e.target.closest('tr');
+  if(!cartRow || !cartRow.dataset.id){
+    return;
+  }
+  let deleteId = cartRow.getAttribute('data-id');
   e.preventDefault();
   if(e.target.classList.contains('clearBtn')){
     deleteOneCart(deleteId);
@@ -362,7 +521,11 @@ const inputs = document.querySelectorAll('.orderInfo-input');
 // 為每一個欄位加上監聽事件 // 距離Input 上層div 最近的 .orderInfo-inputWrap 內的 .orderInfo-message
 inputs.forEach(input => {
   input.addEventListener('input', e => {
-    const msg = e.target.closest('.orderInfo-inputWrap').querySelector('.orderInfo-message');
+    const inputWrap = e.target.closest('.orderInfo-inputWrap');
+    const msg = inputWrap?.querySelector('.orderInfo-message');
+    if(!msg){
+      return;
+    }
     if (e.target.value.trim() !== '') {
       msg.style.display = 'none'; // 有輸入內容 → 隱藏紅字
     } else {
@@ -371,9 +534,178 @@ inputs.forEach(input => {
   });
 });
 
+function initRecommendationCarousel(){
+  const wall = document.querySelector('.recommendation-wall');
+  const topList = document.querySelector('.gallery-top');
+  const bottomList = document.querySelector('.gallery-bottom');
+  const modal = document.querySelector('.recommendation-modal');
+  const modalClose = document.querySelector('.recommendation-modal-close');
+  const modalImg = document.querySelector('.recommendation-modal-img');
+  const modalName = document.querySelector('.recommendation-modal-name');
+  const modalProduct = document.querySelector('.recommendation-modal-product');
+  const modalText = document.querySelector('.recommendation-modal-text');
+
+  if(!wall || !topList || !bottomList || !modal){
+    return;
+  }
+
+  bottomList.querySelectorAll('.recommendation-card').forEach(card=>{
+    topList.appendChild(card);
+  });
+  bottomList.remove();
+  topList.classList.add('recommendation-track');
+
+  const cards = Array.from(topList.querySelectorAll('.recommendation-card'));
+  cards.forEach(card=>{
+    const clone = card.cloneNode(true);
+    clone.setAttribute('aria-hidden','true');
+    topList.appendChild(clone);
+  });
+
+  topList.addEventListener('click',e=>{
+    const card = e.target.closest('.recommendation-card');
+    if(!card){
+      return;
+    }
+
+    const image = card.querySelector('.recommend-img img');
+    const info = card.querySelectorAll('.recommend-img p');
+    const text = card.querySelector('.recommend-content > p:last-child');
+
+    modalImg.src = image?.src || '';
+    modalImg.alt = info[0]?.textContent || '推薦者';
+    modalName.textContent = info[0]?.textContent || '';
+    modalProduct.textContent = info[1]?.textContent || '';
+    modalText.textContent = text?.textContent || '';
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden','false');
+  });
+
+  function closeModal(){
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden','true');
+  }
+
+  modalClose.addEventListener('click',closeModal);
+  modal.addEventListener('click',e=>{
+    if(e.target === modal){
+      closeModal();
+    }
+  });
+}
+
+function initCompareCarousel(){
+  const section = document.querySelector('.furniture-compare');
+  const wrap = section?.querySelector('.wrap');
+  const rows = Array.from(document.querySelectorAll('.compare-table tr')).slice(1);
+
+  if(!section || !wrap || rows.length === 0){
+    return;
+  }
+
+  const carousel = document.createElement('div');
+  carousel.className = 'compare-carousel';
+  carousel.innerHTML = `
+    <div class="compare-track"></div>
+    <div class="compare-modal" aria-hidden="true">
+      <div class="compare-modal-content" role="dialog" aria-modal="true" aria-label="家具比較內容">
+        <button type="button" class="compare-modal-close" aria-label="關閉">close</button>
+        <h4 class="compare-modal-title"></h4>
+        <dl class="compare-modal-list"></dl>
+      </div>
+    </div>
+  `;
+
+  const track = carousel.querySelector('.compare-track');
+  const modal = carousel.querySelector('.compare-modal');
+  const modalTitle = carousel.querySelector('.compare-modal-title');
+  const modalList = carousel.querySelector('.compare-modal-list');
+  const modalClose = carousel.querySelector('.compare-modal-close');
+  const labels = ['窩窩系統模組家具','組合式家具','實木家具'];
+
+  function getCompareIcon(value){
+    if(value === '✅'){
+      return 'check_circle';
+    }
+    if(value === '不一定'){
+      return 'help';
+    }
+    return 'remove_circle';
+  }
+
+  function getCompareText(value){
+    if(value === '✅'){
+      return '支援';
+    }
+    return value || '無';
+  }
+
+  function openCompareModal(card){
+    const title = card.dataset.title;
+    const values = JSON.parse(card.dataset.values);
+    modalTitle.textContent = title;
+    modalList.innerHTML = labels.map((label,index)=>`
+      <div class="compare-modal-row">
+        <dt>${label}</dt>
+        <dd>${values[index]}</dd>
+      </div>
+    `).join('');
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden','false');
+  }
+
+  rows.forEach(row=>{
+    const cells = Array.from(row.children);
+    const title = cells[0]?.textContent.trim() || '';
+    const values = cells.slice(1).map(cell=>cell.textContent.trim() || '無');
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'compare-card';
+    card.dataset.title = title;
+    card.dataset.values = JSON.stringify(values);
+    const mainIcon = getCompareIcon(values[0]);
+    const mainText = getCompareText(values[0]);
+    card.innerHTML = `
+      <span class="compare-card-title">${title}</span>
+      <span class="compare-card-actions">
+        <span class="compare-card-main">
+          <span class="material-icons">${mainIcon}</span>
+          <span>${mainText}</span>
+        </span>
+        <span class="compare-card-more">查看比較</span>
+      </span>
+    `;
+    card.addEventListener('click',()=>openCompareModal(card));
+    track.appendChild(card);
+  });
+
+  Array.from(track.children).forEach(card=>{
+    const clone = card.cloneNode(true);
+    clone.addEventListener('click',()=>openCompareModal(clone));
+    track.appendChild(clone);
+  });
+
+  function closeModal(){
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden','true');
+  }
+
+  modalClose.addEventListener('click',closeModal);
+  modal.addEventListener('click',e=>{
+    if(e.target === modal){
+      closeModal();
+    }
+  });
+
+  wrap.appendChild(carousel);
+  section.classList.add('is-carousel');
+}
+
 
 // 初始值
 function init(){
+  initCompareCarousel();
+  initRecommendationCarousel();
   getProduct(); // 取得所有產品資料
   getCart();    // 取得所有購物車資料
 };

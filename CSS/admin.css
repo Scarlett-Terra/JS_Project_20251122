@@ -793,7 +793,229 @@ body {
 .orderStatus a {
   padding: 10px;
   display: block;
-  color: #0067CE;
+  color: #FFFFFF;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 6px;
+}
+
+.orderStatus.is-paid a {
+  background-color: #168A4A;
+}
+
+.orderStatus.is-unpaid a {
+  background-color: #C44021;
+}
+
+.orderStatus a span {
+  color: inherit;
+}
+
+body {
+  background-color: #F6F7FB;
+  color: #1F2933;
+}
+
+.topBar {
+  background-color: #FFFFFF;
+  border-bottom: 8px solid #000000;
+  -webkit-box-shadow: 0 4px 16px #0000000D;
+          box-shadow: 0 4px 16px #0000000D;
+}
+
+.section-title {
+  color: #1F2933;
+  font-weight: bold;
+}
+
+#chart {
+  max-width: 620px;
+  min-height: 320px;
+  margin: 0 auto 48px;
+  padding: 24px;
+  background-color: #FFFFFF;
+  border: 1px solid #E6E8EF;
+  border-radius: 8px;
+  -webkit-box-shadow: 0 10px 28px #00000012;
+          box-shadow: 0 10px 28px #00000012;
+}
+
+.orderPage-list {
+  margin-bottom: 60px;
+  padding: 28px;
+  background-color: #FFFFFF;
+  border: 1px solid #E6E8EF;
+  border-radius: 8px;
+  -webkit-box-shadow: 0 10px 28px #00000012;
+          box-shadow: 0 10px 28px #00000012;
+}
+
+.orderPage-list .discardAllBtn {
+  background-color: #FFFFFF;
+  color: #C44021;
+  border-color: #C44021;
+  font-size: 1rem;
+}
+
+.orderPage-list .discardAllBtn:hover {
+  background-color: #C44021;
+  color: #FFFFFF;
+}
+
+.orderTableWrap {
+  border: 1px solid #E6E8EF;
+  border-radius: 8px;
+}
+
+.orderPage-table {
+  overflow: hidden;
+  border: 0;
+  background-color: #FFFFFF;
+  font-size: 0.9375rem;
+}
+
+.orderPage-table thead {
+  background-color: #F1F3F8;
+}
+
+.orderPage-table th {
+  color: #4B5563;
+  font-size: 0.875rem;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.orderPage-table th,
+.orderPage-table td {
+  border: 0;
+  border-bottom: 1px solid #E6E8EF;
+  padding: 14px 12px;
+}
+
+.orderPage-table tbody tr:hover {
+  background-color: #FAFBFF;
+}
+
+.orderPage-table td:first-child {
+  color: #301E5F;
+  font-weight: bold;
+}
+
+.orderPage-table td p + p {
+  margin-top: 4px;
+  color: #6B7280;
+  font-size: 0.875rem;
+}
+
+.orderStatus a {
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.delSingleOrder-Btn {
+  min-width: 64px;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+@media (min-width: 768px) {
+  .orderTableWrap {
+    overflow-x: auto;
+  }
+
+  .orderPage-table {
+    min-width: 1080px;
+  }
+
+  .orderPage-table thead {
+    background-color: #182235;
+  }
+
+  .orderPage-table th {
+    color: #FFFFFF;
+  }
+
+  .orderPage-table th:nth-child(1),
+  .orderPage-table td:nth-child(1) {
+    width: 12%;
+  }
+
+  .orderPage-table th:nth-child(2),
+  .orderPage-table td:nth-child(2) {
+    width: 10%;
+  }
+
+  .orderPage-table th:nth-child(3),
+  .orderPage-table td:nth-child(3) {
+    width: 12%;
+  }
+
+  .orderPage-table th:nth-child(4),
+  .orderPage-table td:nth-child(4) {
+    width: 12%;
+  }
+
+  .orderPage-table th:nth-child(5),
+  .orderPage-table td:nth-child(5) {
+    width: 27%;
+  }
+
+  .orderPage-table th:nth-child(6),
+  .orderPage-table td:nth-child(6) {
+    width: 10%;
+  }
+
+  .orderPage-table th:nth-child(7),
+  .orderPage-table td:nth-child(7) {
+    width: 8%;
+    text-align: center;
+  }
+
+  .orderPage-table th:nth-child(8),
+  .orderPage-table td:nth-child(8) {
+    width: 9%;
+    text-align: center;
+  }
+
+  .orderPage-table td {
+    color: #07111F;
+    line-height: 1.65;
+  }
+
+  .orderPage-table td[data-label="訂單品項"] p {
+    color: #07111F;
+  }
+
+  .orderStatus a {
+    display: inline-block;
+    width: 76px;
+    padding: 8px 0;
+    border-radius: 999px;
+  }
+
+  .orderStatus.is-paid a {
+    background-color: #0F7A3B;
+  }
+
+  .orderStatus.is-unpaid a {
+    background-color: #B8321A;
+  }
+
+  .delSingleOrder-Btn {
+    width: 64px;
+    min-width: 0;
+    padding: 8px 0;
+    background-color: #B8321A;
+    border-radius: 999px;
+  }
+
+  .delSingleOrder-Btn:hover {
+    background-color: #7F1D1D;
+    opacity: 1;
+  }
 }
 
 .orderTableWrap {
@@ -808,3 +1030,174 @@ body {
   display: none;
 }
 /*# sourceMappingURL=all.css.map */
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.wrap {
+  width: 100%;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+#chart,
+#chart svg {
+  max-width: 100%;
+}
+
+.orderTableWrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: auto;
+  scrollbar-width: auto;
+}
+
+.orderTableWrap::-webkit-scrollbar {
+  display: block;
+  height: 8px;
+}
+
+.orderPage-table {
+  table-layout: fixed;
+}
+
+.orderPage-table th,
+.orderPage-table td {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@media (max-width: 767px) {
+  .topBar {
+    margin-bottom: 20px;
+  }
+
+  .orderTableWrap {
+    overflow-x: visible;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+
+  .orderPage-list {
+    padding: 40px 15px;
+  }
+
+  .orderPage-list .discardAllBtn {
+    -ms-flex-item-align: stretch;
+        align-self: stretch;
+    text-align: center;
+  }
+
+  .orderPage-table,
+  .orderPage-table tbody,
+  .orderPage-table tr,
+  .orderPage-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .orderPage-table {
+    border: 0;
+    table-layout: auto;
+    font-size: 0.9375rem;
+  }
+
+  .orderPage-table thead {
+    display: none;
+  }
+
+  .orderPage-table tr {
+    padding: 18px;
+    margin-bottom: 18px;
+    background-color: #FFFFFF;
+    border: 1px solid #E5E5E5;
+    border-radius: 8px;
+    -webkit-box-shadow: 0 8px 20px #00000012;
+            box-shadow: 0 8px 20px #00000012;
+  }
+
+  .orderPage-table td {
+    padding: 9px 0;
+    border: 0;
+    color: #111111;
+  }
+
+  .orderPage-table td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 4px;
+    color: #797979;
+    font-size: 0.8125rem;
+    font-weight: bold;
+  }
+
+  .orderPage-table td:first-child {
+    padding-top: 0;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #EAEAEA;
+    color: #301E5F;
+    font-size: 1rem;
+  }
+
+  .orderPage-table td[data-label="聯絡人"] {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+    gap: 16px;
+  }
+
+  .orderPage-table td[data-label="聯絡人"]::before {
+    -ms-flex-negative: 0;
+        flex-shrink: 0;
+  }
+
+  .orderPage-table td[data-label="訂單品項"] p {
+    margin-bottom: 4px;
+  }
+
+  .orderStatus {
+    padding-top: 12px;
+  }
+
+  .orderStatus a {
+    display: inline-block;
+    min-width: 92px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    text-align: center;
+    text-decoration: none;
+    color: #FFFFFF;
+  }
+
+  .orderStatus.is-paid a {
+    background-color: #168A4A;
+  }
+
+  .orderStatus.is-unpaid a {
+    background-color: #C44021;
+  }
+
+  .orderStatus a span {
+    color: inherit;
+  }
+
+  .orderPage-table td:last-child {
+    padding-bottom: 0;
+  }
+
+  .delSingleOrder-Btn {
+    width: 100%;
+    min-height: 42px;
+    border-radius: 6px;
+    font-size: 1rem;
+  }
+}

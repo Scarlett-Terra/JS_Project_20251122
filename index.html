@@ -19,7 +19,6 @@
       <img src="https://github.com/hexschool/2022-web-layout-training/blob/main/js_week5/main_img.png?raw=true" alt="">
       <img src="https://github.com/hexschool/2022-web-layout-training/blob/main/js_week5/logo.png?raw=true" alt="">
     </div>
-    <div id="chart"></div>
     <form action="" class="addTicket-form">
       <h1 class="title"><span><i class="fas fa-plus-circle"></i></span>新增旅遊套票</h1>
       <div class="form-group">
@@ -52,10 +51,6 @@
           <label for="ticketRegion">景點地區</label>
           <select id="ticketRegion" name="景點地區">
             <option value="" disabled selected hidden>請選擇景點地區</option>
-            <option value="台北">台北</option>
-            <option value="台中">台中</option>
-            <option value="高雄">高雄</option>
-            <option value="花蓮">花蓮</option>
           </select>
         </div>
         <div class="alert-message">
@@ -117,6 +112,12 @@
     </form>
   </section>
   <section class="main-content">
+    <div class="data-overview">
+      <div class="chart-panel">
+        <h2>套票地區比重</h2>
+        <div id="chart"></div>
+      </div>
+    </div>
     
     <!-- 搜尋區 -->
     <div class="search-area">
@@ -124,10 +125,6 @@
         
         <option value="地區搜尋" disabled selected hidden>地區搜尋</option>
         <option value="">全部地區</option>
-        <option value="台北">台北</option>
-        <option value="台中">台中</option>
-        <option value="高雄">高雄</option>
-        <option value="花蓮">花蓮</option>
       </select>
       <p id="searchResult-text">本次搜尋共 3 筆資料</p>
     </div>

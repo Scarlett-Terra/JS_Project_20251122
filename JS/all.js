@@ -3,19 +3,84 @@ console.clear();
 //先確認檔案是否正確帶入axios
 
 let data = [];
+let savedTicketData = [];
+
+const STORAGE_KEY = 'travelTicketHistory';
+const taiwanCities = [
+  '台北市',
+  '新北市',
+  '桃園市',
+  '台中市',
+  '台南市',
+  '高雄市',
+  '基隆市',
+  '新竹市',
+  '嘉義市',
+  '新竹縣',
+  '苗栗縣',
+  '彰化縣',
+  '南投縣',
+  '雲林縣',
+  '嘉義縣',
+  '屏東縣',
+  '宜蘭縣',
+  '花蓮縣',
+  '台東縣',
+  '澎湖縣',
+  '金門縣',
+  '連江縣'
+];
+
+const cityNameMap = {
+  台北: '台北市',
+  台中: '台中市',
+  高雄: '高雄市',
+  花蓮: '花蓮縣'
+};
 
 //網址另外放，會讓程式碼，更乾淨
 //LV2
 const getUrl = 'https://raw.githubusercontent.com/hexschool/js-training/main/travelApi.json';
 
 axios.get(getUrl).then((response)=>{
-  
-  data = response.data.data;
+  savedTicketData = loadSavedTicketData();
+  data = normalizeAreaData(response.data.data).concat(savedTicketData);
   renderData(data);
   formatData();
 }).catch((error)=>{
     console.log(`有細節出錯，${error}`);
+    savedTicketData = loadSavedTicketData();
+    data = savedTicketData;
+    renderData(data);
+    formatData();
 })
+
+function normalizeAreaData(ticketData){
+  return ticketData.map(function(item){
+    return {
+      ...item,
+      area: cityNameMap[item.area] || item.area
+    };
+  });
+}
+
+function loadSavedTicketData(){
+  const savedData = localStorage.getItem(STORAGE_KEY);
+  if(savedData === null){
+    return [];
+  }
+
+  try{
+    return normalizeAreaData(JSON.parse(savedData));
+  }catch(error){
+    console.log('歷史資料讀取失敗', error);
+    return [];
+  }
+}
+
+function saveTicketData(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(savedTicketData));
+}
 
 function formatData(){
 //篩選地區，並累加數字上去
@@ -28,9 +93,9 @@ data.forEach(function(item,index){
   }else{
      totalObj[item.area] += 1 ;
   }
-   //entries 二維陣列包陣列=> 專門取key屬性 與 value值 同時抓取。
-  renderChart(Object.entries(totalObj));
 }); 
+//entries 二維陣列包陣列=> 專門取key屬性 與 value值 同時抓取。
+renderChart(Object.entries(totalObj));
 
 
 //繼續陣列再包陣列
@@ -133,6 +198,20 @@ renderData(data);//最後渲染完整的卡片套票
 //取值時，都需要console.log();檢查是否搜索到正確資料
 const regionSearch = document.querySelector('.regionSearch');
 
+function renderCityOptions(){
+  taiwanCities.forEach(function(city){
+    const searchOption = document.createElement('option');
+    searchOption.value = city;
+    searchOption.textContent = city;
+    regionSearch.appendChild(searchOption);
+
+    const addOption = document.createElement('option');
+    addOption.value = city;
+    addOption.textContent = city;
+    ticketRegion.appendChild(addOption);
+  });
+}
+
 
 function filterData(){ // 篩選地區的資料集
   let filterResult= [] ; //篩選結果作為空陣列
@@ -166,6 +245,8 @@ const ticketPrice = document.querySelector('#ticketPrice');
 const ticketNum = document.querySelector('#ticketNum');
 const ticketRate = document.querySelector('#ticketRate');
 const ticketDescription = document.querySelector('#ticketDescription');
+
+renderCityOptions();
 
 //套票按鈕
 const addTicketBtn = document.querySelector('.addTicket-btn');
@@ -204,17 +285,22 @@ function addData(){ //新增資料集，創建空物件，客戶輸入什麼就�
   
   if(errorMsg){ // 如果 errorMsg 現在真的是 ''空字串，請提示彈出給我上面的文字內容
     alert(errorMsg);
-    return; //依但沒完整填寫，就return 彈出提示畫面，並中斷函式。直到內容填寫完整才進行下一步
+    return false; //依但沒完整填寫，就return 彈出提示畫面，並中斷函式。直到內容填寫完整才進行下一步
   }
   
   data.push(obj);  //將已處理好的obj資料推上去
+  savedTicketData.push(obj);
+  saveTicketData();
   regionSearch.value = ''; // 新增好套票內容，就讓搜索地區的值 等於空字串。這樣能回到全部地區畫面
   renderData(data); // 渲染(新資料集內容)
   addTicketForm.reset(); // 輸入好新增套票內容，那麼Form表單就先清空，以便於下次填寫
+  return true;
 }
 
 addTicketBtn.addEventListener('click',function(){ // 透過新增套票BNT按鈕，進行click 點擊觸發函式 再包覆我剛做好的 新增資料集函式
-  addData();
-  formatData(); // 圓餅數據圖 放到新增卡片區時，也都需要呈現出來
+  const isSuccess = addData();
+  if(isSuccess){
+    formatData(); // 圓餅數據圖 放到新增卡片區時，也都需要呈現出來
+  }
   
 })

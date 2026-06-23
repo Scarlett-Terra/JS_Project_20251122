@@ -47,23 +47,25 @@ function renderOrders(){
         productStr += `
         <p>${products.title}</p> x ${products.quantity}`;
     });
+        const statusClass = order.paid ? 'is-paid' : 'is-unpaid';
+        const statusText = order.paid ? '已處理' : '未處理';
         
         str +=`<tr data-id="${order.id}">
-                    <td>${order.id}</td>
-                        <td>
+                    <td data-label="訂單編號">${order.id}</td>
+                        <td data-label="聯絡人">
                         <p>${order.user.name}</p>
                         <p>${order.user.tel}</p>
                     </td>
-                    <td>${order.user.address}</td>
-                    <td>${order.user.email}</td>
-                    <td>
+                    <td data-label="聯絡地址">${order.user.address}</td>
+                    <td data-label="電子郵件">${order.user.email}</td>
+                    <td data-label="訂單品項">
                         ${productStr}
                     </td>
-                    <td>${orderDataTwo}</td> 
-                    <td class="orderStatus">
-                        <a href="#" class="handle">${order.paid ? `<span style="color:green">已處理</span>` : `<span style="color:red">未處理</span>`}</a>  
+                    <td data-label="訂單日期">${orderDataTwo}</td> 
+                    <td class="orderStatus ${statusClass}" data-label="訂單狀態">
+                        <a href="#" class="handle"><span>${statusText}</span></a>  
                     </td>
-                    <td>
+                    <td data-label="操作">
                         <input type="button" class="delSingleOrder-Btn" value="刪除">
                     </td>
                 </tr>`;

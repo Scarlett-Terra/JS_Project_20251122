@@ -220,9 +220,9 @@ let chart = c3.generate({
     },
     padding: {
         top: 8,
-        right: isMobile ? 8 : 20,
+        right: isMobile ? 8 : 8,
         bottom: 8,
-        left: isMobile ? 8 : 20
+        left: isMobile ? 8 : 8
     },
     legend: {
         show: false
